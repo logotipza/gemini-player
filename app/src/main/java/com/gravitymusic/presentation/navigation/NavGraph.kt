@@ -29,7 +29,7 @@ fun NavGraph(navController: NavHostController) {
             PlaylistsScreen(navController = navController)
         }
         composable(route = Screen.Settings.route) {
-            SettingsScreen(navController = navController)
+            com.gravitymusic.presentation.screens.cloud.CloudSyncScreen(navController = navController)
         }
     }
 }
