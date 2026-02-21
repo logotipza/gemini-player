@@ -86,6 +86,13 @@ dependencies {
     implementation("androidx.media3:media3-session:$media3_version")
     implementation("androidx.media3:media3-ui:$media3_version")
 
+    // Local Files & Metadata (Phase 3)
+    implementation("net.jthink:jaudiotagger:3.0.1")
+    implementation("androidx.documentfile:documentfile:1.0.1")
+    val work_version = "2.9.0"
+    implementation("androidx.work:work-runtime-ktx:$work_version")
+    implementation("androidx.hilt:hilt-work:1.1.0")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
