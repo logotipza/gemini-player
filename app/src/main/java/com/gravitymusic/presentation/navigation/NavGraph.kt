@@ -11,13 +11,16 @@ import com.gravitymusic.presentation.screens.playlists.PlaylistsScreen
 import com.gravitymusic.presentation.screens.settings.SettingsScreen
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(
+    navController: NavHostController,
+    startDestination: String = Screen.Main.route
+) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Main.route
+        startDestination = startDestination
     ) {
         composable(route = Screen.Main.route) {
-            MainScreen(navController = navController)
+            MainScreen(rootNavController = navController)
         }
         composable(route = Screen.Player.route) {
             PlayerScreen(navController = navController)
