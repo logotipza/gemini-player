@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Музыка Гравитации</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_playlists">Плейлисты</string>
+    <string name="nav_folders">Папки</string>
+    <string name="nav_cloud">Облако</string>
+    <string name="nav_settings">Настройки</string>
+    
+    <!-- Player -->
+    <string name="player_now_playing">Сейчас играет</string>
+    <string name="player_play">Играть</string>
+    <string name="player_pause">Пауза</string>
+    <string name="player_next">Следующий</string>
+    <string name="player_prev">Предыдущий</string>
+
+    <!-- Cloud Sync -->
+    <string name="cloud_sync_yandex">Синхронизировать с Яндекс Диском</string>
+    <string name="cloud_downloading">Скачивание...</string>
+    
+    <!-- General -->
+    <string name="error_generic">Что-то пошло не так</string>
+    <string name="loading">Загрузка...</string>
+</resources>

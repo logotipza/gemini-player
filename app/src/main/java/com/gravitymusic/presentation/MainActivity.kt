@@ -10,15 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.gravitymusic.presentation.navigation.NavGraph
+import com.gravitymusic.presentation.theme.GravityMusicTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            GravityMusicTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

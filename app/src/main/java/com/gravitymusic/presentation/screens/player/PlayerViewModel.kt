@@ -15,6 +15,12 @@ class PlayerViewModel @Inject constructor(
 
     val isPlaying: StateFlow<Boolean> = musicController.isPlaying
     val currentPosition: StateFlow<Long> = musicController.currentPosition
+    val currentMediaItem: StateFlow<MediaItem?> = musicController.currentMediaItem
+    val queue: StateFlow<List<MediaItem>> = musicController.queue
+
+    fun moveMediaItem(fromPosition: Int, toPosition: Int) {
+        musicController.moveMediaItem(fromPosition, toPosition)
+    }
 
     fun playMedia(uri: String) {
         val mediaItem = MediaItem.fromUri(uri)

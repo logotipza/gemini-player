@@ -25,4 +25,12 @@ object AppModule {
             "gravity_music_db"
         ).build()
     }
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(
+        @ApplicationContext context: Context
+    ): androidx.work.WorkManager {
+        return androidx.work.WorkManager.getInstance(context)
+    }
 }

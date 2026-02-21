@@ -7,7 +7,7 @@ import android.os.Environment
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.gravitymusic.core.util.Result
+import com.gravitymusic.core.util.Result as AppResult
 import com.gravitymusic.domain.repository.CloudRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -25,7 +25,7 @@ class CloudSyncWorker @AssistedInject constructor(
 
         return try {
             val resourcesResult = cloudRepository.getFolderContents(yandexPath)
-            if (resourcesResult is Result.Success) {
+            if (resourcesResult is AppResult.Success) {
                 val items = resourcesResult.data
                 
                 // create target local folder
@@ -47,7 +47,7 @@ class CloudSyncWorker @AssistedInject constructor(
 
                     // Get transient download link from Yandex
                     val linkResult = cloudRepository.getDownloadLink(item.path)
-                    if (linkResult is Result.Success) {
+                    if (linkResult is AppResult.Success) {
                         val downloadUri = Uri.parse(linkResult.data)
                         
                         val request = DownloadManager.Request(downloadUri)

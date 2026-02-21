@@ -31,6 +31,12 @@ class MusicController(private val context: Context) {
     private val _currentPosition = MutableStateFlow(0L)
     val currentPosition: StateFlow<Long> = _currentPosition.asStateFlow()
 
+    private val _currentMediaItem = MutableStateFlow<MediaItem?>(null)
+    val currentMediaItem: StateFlow<MediaItem?> = _currentMediaItem.asStateFlow()
+
+    private val _queue = MutableStateFlow<List<MediaItem>>(emptyList())
+    val queue: StateFlow<List<MediaItem>> = _queue.asStateFlow()
+
     // A-B Repeat state
     private var pointA: Long? = null
     private var pointB: Long? = null
@@ -43,7 +49,18 @@ class MusicController(private val context: Context) {
         mediaControllerFuture?.addListener({
             mediaController = mediaControllerFuture?.get()
             setupPlayerListener()
+            updateQueue()
         }, MoreExecutors.directExecutor())
+    }
+    
+    private fun updateQueue() {
+        val controller = mediaController ?: return
+        val count = controller.mediaItemCount
+        val list = mutableListOf<MediaItem>()
+        for (i in 0 until count) {
+            list.add(controller.getMediaItemAt(i))
+        }
+        _queue.value = list
     }
 
     private fun setupPlayerListener() {
@@ -51,6 +68,14 @@ class MusicController(private val context: Context) {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 _isPlaying.value = isPlaying
                 if (isPlaying) startPositionTracking() else stopPositionTracking()
+            }
+            
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                _currentMediaItem.value = mediaItem
+            }
+
+            override fun onTimelineChanged(timeline: androidx.media3.common.Timeline, reason: Int) {
+                updateQueue()
             }
         })
     }
@@ -92,6 +117,10 @@ class MusicController(private val context: Context) {
     fun skipToNext() { mediaController?.seekToNextMediaItem() }
     
     fun skipToPrevious() { mediaController?.seekToPreviousMediaItem() }
+
+    fun moveMediaItem(currentIndex: Int, newIndex: Int) {
+        mediaController?.moveMediaItem(currentIndex, newIndex)
+    }
 
     fun setShuffleMode(enabled: Boolean) {
         mediaController?.shuffleModeEnabled = enabled

@@ -11,7 +11,7 @@ import com.gravitymusic.media.equalizer.EqualizerManager
 class GravityAudioService : MediaSessionService() {
 
     private var mediaSession: MediaSession? = null
-    private lateinit val exoPlayer: ExoPlayer
+    private lateinit var exoPlayer: ExoPlayer
     private val equalizerManager = EqualizerManager()
 
     override fun onCreate() {

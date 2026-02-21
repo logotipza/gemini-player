@@ -11,4 +11,11 @@ sealed interface DataError: Error {
         UNSUPPORTED_FORMAT,
         UNKNOWN
     }
+    enum class Network: DataError {
+        TIMEOUT,
+        UNAUTHORIZED,
+        NO_INTERNET,
+        SERVER_ERROR,
+        UNKNOWN
+    }
 }
