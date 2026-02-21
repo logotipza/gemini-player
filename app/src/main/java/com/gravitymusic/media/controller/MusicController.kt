@@ -34,6 +34,9 @@ class MusicController(private val context: Context) {
     private val _currentMediaItem = MutableStateFlow<MediaItem?>(null)
     val currentMediaItem: StateFlow<MediaItem?> = _currentMediaItem.asStateFlow()
 
+    private val _duration = MutableStateFlow(0L)
+    val duration: StateFlow<Long> = _duration.asStateFlow()
+
     private val _queue = MutableStateFlow<List<MediaItem>>(emptyList())
     val queue: StateFlow<List<MediaItem>> = _queue.asStateFlow()
 
@@ -80,6 +83,13 @@ class MusicController(private val context: Context) {
             
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 _currentMediaItem.value = mediaItem
+                _duration.value = mediaController?.duration?.coerceAtLeast(0L) ?: 0L
+            }
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_READY) {
+                    _duration.value = mediaController?.duration?.coerceAtLeast(0L) ?: 0L
+                }
             }
 
             override fun onTimelineChanged(timeline: androidx.media3.common.Timeline, reason: Int) {
@@ -116,6 +126,10 @@ class MusicController(private val context: Context) {
         mediaController?.setMediaItem(mediaItem)
         mediaController?.prepare()
         mediaController?.play()
+    }
+
+    fun seekTo(position: Long) {
+        mediaController?.seekTo(position)
     }
 
     fun play() { mediaController?.play() }

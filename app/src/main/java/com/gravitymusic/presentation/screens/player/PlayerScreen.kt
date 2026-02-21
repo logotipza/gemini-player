@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.*
@@ -34,6 +37,8 @@ fun PlayerScreen(
     val mediaItem by viewModel.currentMediaItem.collectAsState()
     val playbackSpeed by viewModel.playbackSpeed.collectAsState()
     val abState by viewModel.abState.collectAsState()
+    val currentPosition by viewModel.currentPosition.collectAsState()
+    val duration by viewModel.duration.collectAsState()
     
     // Rotating Album Art Animation
     val infiniteTransition = rememberInfiniteTransition(label = "player_rotation_anim")
@@ -117,7 +122,30 @@ fun PlayerScreen(
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Progress Bar
+            val sliderPos = if (duration > 0) (currentPosition.toFloat() / duration.toFloat()) else 0f
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(formatTime(currentPosition), style = MaterialTheme.typography.bodySmall)
+                Slider(
+                    value = sliderPos,
+                    onValueChange = { percent ->
+                        viewModel.seekTo((percent * duration).toLong())
+                    },
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+                Text(formatTime(duration), style = MaterialTheme.typography.bodySmall)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Controls (Glassmorphism card)
             Card(
@@ -131,28 +159,40 @@ fun PlayerScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(onClick = { viewModel.cyclePlaybackSpeed() }) {
+                        // Speed Control
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { viewModel.decreaseSpeed() }) {
+                                Icon(Icons.Filled.Remove, contentDescription = "Decrease Speed", modifier = Modifier.size(20.dp))
+                            }
                             Text(
-                                text = "${playbackSpeed}x",
+                                text = "${String.format("%.1f", playbackSpeed)}x",
                                 color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 4.dp)
                             )
+                            IconButton(onClick = { viewModel.increaseSpeed() }) {
+                                Icon(Icons.Filled.Add, contentDescription = "Increase Speed", modifier = Modifier.size(20.dp))
+                            }
                         }
-                        val abText = when (abState) {
-                            com.gravitymusic.media.controller.MusicController.ABState.OFF -> "A-B: OFF"
-                            com.gravitymusic.media.controller.MusicController.ABState.A_SET -> "A-B: A..."
-                            com.gravitymusic.media.controller.MusicController.ABState.AB_SET -> "A-B: ON"
-                        }
-                        TextButton(onClick = { viewModel.handleABClick() }) {
-                            Text(
-                                text = abText,
-                                color = if (abState == com.gravitymusic.media.controller.MusicController.ABState.AB_SET) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold
-                            )
+
+                        // A-B Control
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val isASet = abState != com.gravitymusic.media.controller.MusicController.ABState.OFF
+                            val isBSet = abState == com.gravitymusic.media.controller.MusicController.ABState.AB_SET
+
+                            TextButton(onClick = { viewModel.setPointA() }, contentPadding = PaddingValues(0.dp)) {
+                                Text("A", color = if (isASet) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+                            }
+                            TextButton(onClick = { viewModel.setPointB() }, contentPadding = PaddingValues(0.dp)) {
+                                Text("B", color = if (isBSet) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+                            }
+                            IconButton(onClick = { viewModel.clearABRepeat() }) {
+                                Icon(Icons.Filled.Clear, contentDescription = "Clear A-B", modifier = Modifier.size(20.dp))
+                            }
                         }
                     }
 
@@ -186,4 +226,11 @@ fun PlayerScreen(
             }
         }
     }
+}
+
+private fun formatTime(ms: Long): String {
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return String.format("%02d:%02d", minutes, seconds)
 }

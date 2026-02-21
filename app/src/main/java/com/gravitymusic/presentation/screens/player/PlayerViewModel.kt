@@ -19,6 +19,7 @@ class PlayerViewModel @Inject constructor(
     val queue: StateFlow<List<MediaItem>> = musicController.queue
     val playbackSpeed: StateFlow<Float> = musicController.playbackSpeed
     val abState: StateFlow<MusicController.ABState> = musicController.abState
+    val duration: StateFlow<Long> = musicController.duration
 
     fun moveMediaItem(fromPosition: Int, toPosition: Int) {
         musicController.moveMediaItem(fromPosition, toPosition)
@@ -27,6 +28,10 @@ class PlayerViewModel @Inject constructor(
     fun playMedia(uri: String) {
         val mediaItem = MediaItem.fromUri(uri)
         musicController.playMedia(mediaItem)
+    }
+
+    fun seekTo(position: Long) {
+        musicController.seekTo(position)
     }
 
     fun togglePlayPause() {
@@ -54,27 +59,27 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun cyclePlaybackSpeed() {
-        val current = playbackSpeed.value
-        val next = when (current) {
-            1.0f -> 1.25f
-            1.25f -> 1.5f
-            1.5f -> 2.0f
-            2.0f -> 0.5f
-            0.5f -> 0.75f
-            0.75f -> 1.0f
-            else -> 1.0f
-        }
+        // Оставили для обратной совместимости, если где-то еще используется
+    }
+
+    fun increaseSpeed() {
+        val next = (playbackSpeed.value + 0.1f).coerceAtMost(2.0f)
+        musicController.setPlaybackSpeed(next)
+    }
+
+    fun decreaseSpeed() {
+        val next = (playbackSpeed.value - 0.1f).coerceAtLeast(0.5f)
         musicController.setPlaybackSpeed(next)
     }
 
     // A-B Repeat functionality
     fun handleABClick() {
-        when (abState.value) {
-            MusicController.ABState.OFF -> musicController.setPointA()
-            MusicController.ABState.A_SET -> musicController.setPointB()
-            MusicController.ABState.AB_SET -> musicController.clearABRepeat()
-        }
+        // Old cycle click function, can be removed if unused.
     }
+    
+    fun setPointA() = musicController.setPointA()
+    fun setPointB() = musicController.setPointB()
+    fun clearABRepeat() = musicController.clearABRepeat()
 
     override fun onCleared() {
         musicController.release()
