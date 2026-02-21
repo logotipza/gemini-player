@@ -37,7 +37,15 @@ class MusicController(private val context: Context) {
     private val _queue = MutableStateFlow<List<MediaItem>>(emptyList())
     val queue: StateFlow<List<MediaItem>> = _queue.asStateFlow()
 
+    // Скорость воспроизведения
+    private val _playbackSpeed = MutableStateFlow(1.0f)
+    val playbackSpeed: StateFlow<Float> = _playbackSpeed.asStateFlow()
+
     // A-B Repeat state
+    enum class ABState { OFF, A_SET, AB_SET }
+    private val _abState = MutableStateFlow(ABState.OFF)
+    val abState: StateFlow<ABState> = _abState.asStateFlow()
+
     private var pointA: Long? = null
     private var pointB: Long? = null
     private var abLoopJob: Job? = null
@@ -133,23 +141,29 @@ class MusicController(private val context: Context) {
     fun setPlaybackSpeed(speed: Float) {
         val coercedSpeed = speed.coerceIn(0.5f, 2.0f)
         mediaController?.playbackParameters = PlaybackParameters(coercedSpeed)
+        _playbackSpeed.value = coercedSpeed
     }
 
     // A-B Repeat API
     fun setPointA() {
         pointA = mediaController?.currentPosition
+        if (pointA != null) {
+            _abState.value = ABState.A_SET
+        }
     }
 
     fun setPointB() {
         val current = mediaController?.currentPosition ?: return
         if (pointA != null && current > pointA!!) {
             pointB = current
+            _abState.value = ABState.AB_SET
         }
     }
 
     fun clearABRepeat() {
         pointA = null
         pointB = null
+        _abState.value = ABState.OFF
     }
 
     fun release() {

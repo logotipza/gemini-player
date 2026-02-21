@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import com.gravitymusic.R
 private sealed class BottomNavItem(val route: String, val titleResId: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
     object Player : BottomNavItem(Screen.Player.route, R.string.nav_home, Icons.Filled.Home)
     object Playlists : BottomNavItem(Screen.Playlists.route, R.string.nav_playlists, Icons.Filled.List)
+    object Folders : BottomNavItem(Screen.Folders.route, R.string.nav_folders, Icons.Filled.Folder)
     object Settings : BottomNavItem(Screen.Settings.route, R.string.nav_settings, Icons.Filled.Settings)
 }
 
@@ -35,6 +37,7 @@ fun MainScreen(rootNavController: NavController) { // rootNavController для �
     val items = listOf(
         BottomNavItem.Player,
         BottomNavItem.Playlists,
+        BottomNavItem.Folders,
         BottomNavItem.Settings
     )
 

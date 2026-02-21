@@ -17,6 +17,8 @@ class PlayerViewModel @Inject constructor(
     val currentPosition: StateFlow<Long> = musicController.currentPosition
     val currentMediaItem: StateFlow<MediaItem?> = musicController.currentMediaItem
     val queue: StateFlow<List<MediaItem>> = musicController.queue
+    val playbackSpeed: StateFlow<Float> = musicController.playbackSpeed
+    val abState: StateFlow<MusicController.ABState> = musicController.abState
 
     fun moveMediaItem(fromPosition: Int, toPosition: Int) {
         musicController.moveMediaItem(fromPosition, toPosition)
@@ -42,7 +44,6 @@ class PlayerViewModel @Inject constructor(
     fun setShuffleMode(enabled: Boolean) = musicController.setShuffleMode(enabled)
 
     fun toggleRepeatMode() {
-        // Toggle between basic OFF, ONE, ALL
         val currentMode = musicController.mediaController?.repeatMode ?: Player.REPEAT_MODE_OFF
         val nextMode = when (currentMode) {
             Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
@@ -52,12 +53,28 @@ class PlayerViewModel @Inject constructor(
         musicController.setRepeatMode(nextMode)
     }
 
-    fun setPlaybackSpeed(speed: Float) = musicController.setPlaybackSpeed(speed)
+    fun cyclePlaybackSpeed() {
+        val current = playbackSpeed.value
+        val next = when (current) {
+            1.0f -> 1.25f
+            1.25f -> 1.5f
+            1.5f -> 2.0f
+            2.0f -> 0.5f
+            0.5f -> 0.75f
+            0.75f -> 1.0f
+            else -> 1.0f
+        }
+        musicController.setPlaybackSpeed(next)
+    }
 
     // A-B Repeat functionality
-    fun setPointA() = musicController.setPointA()
-    fun setPointB() = musicController.setPointB()
-    fun clearABRepeat() = musicController.clearABRepeat()
+    fun handleABClick() {
+        when (abState.value) {
+            MusicController.ABState.OFF -> musicController.setPointA()
+            MusicController.ABState.A_SET -> musicController.setPointB()
+            MusicController.ABState.AB_SET -> musicController.clearABRepeat()
+        }
+    }
 
     override fun onCleared() {
         musicController.release()

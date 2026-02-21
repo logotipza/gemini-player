@@ -33,4 +33,10 @@ object AppModule {
     ): androidx.work.WorkManager {
         return androidx.work.WorkManager.getInstance(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideEqualizerManager(): com.gravitymusic.media.equalizer.EqualizerManager {
+        return com.gravitymusic.media.equalizer.EqualizerManager()
+    }
 }

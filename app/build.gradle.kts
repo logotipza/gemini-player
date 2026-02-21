@@ -112,6 +112,7 @@ dependencies {
     implementation("androidx.glance:glance-appwidget:1.0.0")
     implementation("androidx.glance:glance-material3:1.0.0")
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+    implementation("io.coil-kt:coil-compose:2.5.0")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
     testImplementation("junit:junit:4.13.2")

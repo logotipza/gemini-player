@@ -8,11 +8,16 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.gravitymusic.media.equalizer.EqualizerManager
 
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
+@AndroidEntryPoint
 class GravityAudioService : MediaSessionService() {
 
     private var mediaSession: MediaSession? = null
     private lateinit var exoPlayer: ExoPlayer
-    private val equalizerManager = EqualizerManager()
+    
+    @Inject lateinit var equalizerManager: EqualizerManager
 
     override fun onCreate() {
         super.onCreate()

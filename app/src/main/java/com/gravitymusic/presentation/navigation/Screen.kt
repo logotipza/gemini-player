@@ -6,4 +6,5 @@ sealed class Screen(val route: String) {
     object Folders : Screen("folders_screen")
     object Playlists : Screen("playlists_screen")
     object Settings : Screen("settings_screen")
+    object Equalizer : Screen("equalizer_screen")
 }

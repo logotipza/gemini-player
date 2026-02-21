@@ -32,6 +32,8 @@ fun PlayerScreen(
 ) {
     val isPlaying by viewModel.isPlaying.collectAsState()
     val mediaItem by viewModel.currentMediaItem.collectAsState()
+    val playbackSpeed by viewModel.playbackSpeed.collectAsState()
+    val abState by viewModel.abState.collectAsState()
     
     // Rotating Album Art Animation
     val infiniteTransition = rememberInfiniteTransition(label = "player_rotation_anim")
@@ -78,11 +80,21 @@ fun PlayerScreen(
                     .rotate(if (isPlaying) rotation else 0f),
                 contentAlignment = Alignment.Center
             ) {
-                // Placeholder for Cover art
-                Text(
-                    text = "🎵",
-                    style = MaterialTheme.typography.displayLarge
-                )
+                val artworkData = mediaItem?.mediaMetadata?.artworkData
+                if (artworkData != null) {
+                    coil.compose.AsyncImage(
+                        model = artworkData,
+                        contentDescription = "Album Art",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                } else {
+                    // Placeholder for Cover art
+                    Text(
+                        text = "🎵",
+                        style = MaterialTheme.typography.displayLarge
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(48.dp))
@@ -115,10 +127,39 @@ fun PlayerScreen(
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 24.dp),
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = { viewModel.cyclePlaybackSpeed() }) {
+                            Text(
+                                text = "${playbackSpeed}x",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        val abText = when (abState) {
+                            com.gravitymusic.media.controller.MusicController.ABState.OFF -> "A-B: OFF"
+                            com.gravitymusic.media.controller.MusicController.ABState.A_SET -> "A-B: A..."
+                            com.gravitymusic.media.controller.MusicController.ABState.AB_SET -> "A-B: ON"
+                        }
+                        TextButton(onClick = { viewModel.handleABClick() }) {
+                            Text(
+                                text = abText,
+                                color = if (abState == com.gravitymusic.media.controller.MusicController.ABState.AB_SET) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp, start = 24.dp, end = 24.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -141,6 +182,7 @@ fun PlayerScreen(
                         Icon(Icons.Filled.SkipNext, contentDescription = stringResource(R.string.player_next))
                     }
                 }
+              }
             }
         }
     }
